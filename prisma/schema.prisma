@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Student {
+  id         Int          @id @default(autoincrement())
+  name       String
+  lastName   String
+  email      String       @unique
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  Carnet     Carnet[]
+  Grade      Grade[]
+  Attendance Attendance[]
+}
+
+model Carnet {
+  id        Int      @id @default(autoincrement())
+  studentId Int
+  student   Student  @relation(fields: [studentId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Teacher {
+  id             Int              @id @default(autoincrement())
+  name           String
+  lastName       String
+  email          String           @unique
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  TeacherSubject TeacherSubject[]
+}
+
+model Subject {
+  id             Int              @id @default(autoincrement())
+  name           String
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  TeacherSubject TeacherSubject[]
+  Grade          Grade[]
+  Attendance     Attendance[]
+}
+
+model TeacherSubject {
+  id        Int      @id @default(autoincrement())
+  teacherId Int
+  subjectId Int
+  teacher   Teacher  @relation(fields: [teacherId], references: [id])
+  subject   Subject  @relation(fields: [subjectId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Grade {
+  id        Int      @id @default(autoincrement())
+  studentId Int
+  subjectId Int
+  grade     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Student   Student  @relation(fields: [studentId], references: [id])
+  Subject   Subject  @relation(fields: [subjectId], references: [id])
+}
+
+model Attendance {
+  id        Int      @id @default(autoincrement())
+  studentId Int
+  subjectId Int
+  date      DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Student   Student  @relation(fields: [studentId], references: [id])
+  Subject   Subject  @relation(fields: [subjectId], references: [id])
+}
+
+model Seed {
+  id        String   @id
+  seeded_at DateTime @default(now())
+
+  @@map("prisma_seeders")
+}
